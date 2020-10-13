@@ -2,9 +2,13 @@
 
 ## Motivation
 See how terser/uglify remove dead code across versions. E.g. what it can or can not remove.
+
+## Prior arts
 https://github.com/Rich-Harris/terser-playground
-and 
-https://xem.github.io/terser-online/ are 2 prior arts I found, but they are pretty primitive and don't meet all my requirements.
+
+https://xem.github.io/terser-online/ 
+
+Unfortunately they are pretty primitive and don't meet all my requirements.
 
 ## TODOs:
 - Basic UI that takes input code and output minified code using terser
