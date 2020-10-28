@@ -1,5 +1,18 @@
 <script lang="ts">
-	let name = 'world';
+	import Input from "./input.svelte";
+	import Output from "./output.svelte";
+
+	let input = '';
 </script>
 
-<h1>Hello {name}!</h1>
+<style>
+	.app {
+		display: flex;
+		flex-direction: row;
+	}
+</style>
+
+<div class="app">
+	<Input bind:value={input}/>
+	<Output value={input} />
+</div>
