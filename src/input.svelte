@@ -1,6 +1,15 @@
 <script>
-   export let value = '';
+    import { createEventDispatcher } from "svelte";
+
+    export let initialValue = "";
+
+    const dispatch = createEventDispatcher();
+    function onValueChanged(event) {
+        dispatch('value', {
+            value: event.target.value
+        });
+    }
 </script>
 
 <p>input:</p>
-<textarea bind:value={value}></textarea>
+<textarea on:change={onValueChanged}>{initialValue}</textarea>
