@@ -57,7 +57,7 @@
 	</script>
 </svelte:head>
 <div class="app">
-	<select>
+	<select value={versions[versions.length - 1]}>
 		{#each versions as version}
 			<option value={version}>{version}</option>
 		{/each}
