@@ -15,7 +15,16 @@
 		measurementId: "G-LV8CS7FRKZ",
 	});
 
+	interface OptionsState {
+		error?: string;
+		value: Record<string, unknown>;
+	}
+
 	let output = "";
+	let input = "";
+	let options: OptionsState = {
+		value: {},
+	};
 	let versions = [];
 
 	const terserVersionsCallable = firebase
@@ -27,19 +36,24 @@
 	})();
 
 	async function handleInputChange(event) {
-		const input = event.detail.value;
-		output = await tryToMinify(input);
+		input = event.detail.value;
+		output = await tryToMinify(input, options);
 		console.log(output);
 	}
 
-	async function tryToMinify(input: string): Promise<string> {
+	async function tryToMinify(
+		input: string,
+		options: OptionsState
+	): Promise<string> {
+		if (options.error) {
+			return options.error;
+		}
+
 		try {
 			// @ts-ignore
-			const result = await Terser.minify(input, {
-				toplevel: true,
-			});
-			console.log('input', input);
-			console.log('result', result);
+			const result = await Terser.minify(input, options.value);
+			console.log("input", input, options);
+			console.log("result", result);
 			return result.code;
 		} catch (e) {
 			return JSON.stringify(e);
@@ -70,17 +84,43 @@
 		}
 	}
 
+	// TODO: disable the app while the script is loading
+	// TODO: run minify with the new verion once it's loaded
 	function loadTerser(version: string): void {
 		const script = document.createElement("script");
 		script.type = "text/javascript";
 		script.id = "terser";
 		script.src = `https://unpkg.com/terser@${version}/dist/bundle.min.js`;
-		document.getElementsByTagName('html')[0].appendChild(script);
+		document.getElementsByTagName("html")[0].appendChild(script);
+	}
+
+	async function handleOptionChange(event) {
+		try {
+			options.value = JSON.parse(event.detail.value);
+			options.error = undefined;
+		} catch (e) {
+			options.error = `options is not a valid JSON. Error: ${e}`;
+		}
+
+		if (
+			typeof options !== "object" ||
+			options === null ||
+			Array.isArray(options)
+		) {
+			options.error = `options should be an object, but it is ${options}`;
+		}
+
+		output = await tryToMinify(input, options);
 	}
 </script>
 
 <style>
 	.app {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.input-output {
 		display: flex;
 		flex-direction: row;
 	}
@@ -96,6 +136,10 @@
 			<option value={version}>{version}</option>
 		{/each}
 	</select>
-	<Input on:value={handleInputChange} initialValue={''} />
-	<Output value={output} />
+	<div class="input-output">
+		<Input on:value={handleInputChange} initialValue={''} />
+		<Output value={output} />
+	</div>
+	<!-- TODO: use checkboxes for options -->
+	<Input on:value={handleOptionChange} initialValue={'{}'} />
 </div>
