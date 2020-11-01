@@ -11,9 +11,9 @@ https://xem.github.io/terser-online/
 Unfortunately they are pretty primitive and don't meet all my requirements.
 
 ## TODOs:
-- Basic UI that takes input code and output minified code using terser
-- Support options simple - take a JSON blob
-- Support options advanced - let people enable/disable options in UI
-- Support multiple terser versions
+- ~~Basic UI that takes input code and output minified code using terser~~
+- ~~Support options simple - take a JSON blob~~
+- Support options advanced - let people enable/disable options using checkboxes
+- ~~Support multiple terser versions~~
 - Support sharing URL
 - Various UI improvements
