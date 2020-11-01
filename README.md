@@ -17,3 +17,6 @@ Unfortunately they are pretty primitive and don't meet all my requirements.
 - ~~Support multiple terser versions~~
 - Support sharing URL
 - Various UI improvements
+    - code highlight
+    - prettify layout with css
+- Clean up TODOs in code
