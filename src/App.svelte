@@ -115,7 +115,7 @@
 </script>
 
 <style lang="scss">
-
+	@import "bulma/bulma.sass";
 	.app {
 		display: flex;
 		flex-direction: column;
@@ -143,4 +143,9 @@
 	</div>
 	<!-- TODO: use checkboxes for options -->
 	<Input on:value={handleOptionChange} initialValue={'{}'} />
+
+	<div class="buttons">
+		<a class="button is-primary">Primary</a>
+		<a class="button is-link">Link</a>
+	</div>
 </div>
