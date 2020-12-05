@@ -3,6 +3,7 @@
 	import Output from "./output.svelte";
 	import firebase from "firebase/app";
 	import "firebase/functions";
+	import JSON5 from 'json5';
 
 	firebase.initializeApp({
 		apiKey: "AIzaSyAeDajuxjFKAYQAl3JWsPGV5KdCa28OLRk",
@@ -96,7 +97,7 @@
 
 	async function handleOptionChange(event) {
 		try {
-			options.value = JSON.parse(event.detail.value);
+			options.value = JSON5.parse(event.detail.value);
 			options.error = undefined;
 		} catch (e) {
 			options.error = `options is not a valid JSON. Error: ${e}`;

@@ -20,3 +20,4 @@ Unfortunately they are pretty primitive and don't meet all my requirements.
     - code highlight
     - prettify layout with css
 - Clean up TODOs in code
+- ~~Accept relaxed JSON object as configuration~~

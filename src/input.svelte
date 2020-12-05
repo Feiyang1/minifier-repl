@@ -11,5 +11,5 @@
     }
 </script>
 
-<p>input:</p>
-<textarea on:change={onValueChanged}>{initialValue}</textarea>
+<p>input123:</p>
+<textarea on:keyup={onValueChanged}>{initialValue}</textarea>

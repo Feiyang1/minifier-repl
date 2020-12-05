@@ -25,6 +25,7 @@
   "dependencies": {
     "bulma": "^0.9.1",
     "firebase": "8.0.0",
+    "json5": "^2.1.3",
     "node-sass": "5.0.0",
     "sirv-cli": "^1.0.0",
     "terser": "5.3.3"
