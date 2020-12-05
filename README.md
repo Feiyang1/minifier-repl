@@ -19,5 +19,7 @@ Unfortunately they are pretty primitive and don't meet all my requirements.
 - Various UI improvements
     - code highlight
     - prettify layout with css
+    - default value in version selection dropdown
 - Clean up TODOs in code
 - ~~Accept relaxed JSON object as configuration~~
+- Persistence
