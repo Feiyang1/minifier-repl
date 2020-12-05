@@ -116,37 +116,80 @@
 </script>
 
 <style lang="scss">
-	@import "bulma/bulma.sass";
+	// @import "bulma/bulma.sass";
 	.app {
-		display: flex;
-		flex-direction: column;
+		padding: 0.5rem;
 	}
 
-	.input-output {
+	.columns {
+		height: 100%;
+		min-height: 800px;
+	}
+
+	.right {
 		display: flex;
-		flex-direction: row;
+		flex-direction: column;
+
+		.output {
+			flex-grow: 2;
+		}
+
+		.config {
+			flex-grow: 1;
+		}
+	}
+
+	:global(body) {
+		padding: 0.5 rem;
 	}
 </style>
 
 <svelte:head>
-	<script id="terser" src="https://unpkg.com/terser@5.3.8/dist/bundle.min.js">
-	</script>
+	<script id="terser" src="https://unpkg.com/terser@5.3.8/dist/bundle.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
 </svelte:head>
-<div class="app">
-	<select value={versions[versions.length - 1]} on:change={onVersionChange}>
-		{#each versions as version}
-			<option value={version}>{version}</option>
-		{/each}
-	</select>
-	<div class="input-output">
-		<Input on:value={handleInputChange} initialValue={''} />
-		<Output value={output} />
-	</div>
-	<!-- TODO: use checkboxes for options -->
-	<Input on:value={handleOptionChange} initialValue={'{}'} />
 
-	<div class="buttons">
-		<a class="button is-primary">Primary</a>
-		<a class="button is-link">Link</a>
+<div class="app">
+	<nav class="level">
+		<!-- Left side -->
+		<div class="level-left">
+		<div class="level-item">
+			<p class="subtitle is-5">
+			Terser REPL
+			</p>
+		</div>
+		<div class="level-item">
+			<div class="field has-addons">
+			<p class="control">
+				<select value={versions[versions.length - 1]} on:change={onVersionChange}>
+					{#each versions as version}
+						<option value={version}>{version}</option>
+					{/each}
+				</select>
+			</p>
+			</div>
+		</div>
+		</div>
+	
+		<!-- Right side -->
+		<div class="level-right">
+		<p class="level-item"><a>Configuration</a></p>
+		</div>
+	</nav>
+
+	<div class="columns">
+		<div class="column">
+			<Input on:value={handleInputChange} initialValue={''} title="input"/>
+		</div>
+		<div class="column right">
+			<div class="output">
+				<Output value={output} title="output"/>
+			</div>
+			<div class="config">
+				<Input on:value={handleOptionChange} initialValue={'{}'} title="config"/>
+			</div>
+		</div>
 	</div>
 </div>
+
+
