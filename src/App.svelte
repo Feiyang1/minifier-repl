@@ -1,9 +1,11 @@
 <script lang="ts">
 	import Input from "./input.svelte";
 	import Output from "./output.svelte";
+	import { getState, setInput, setOptions, setTerserVersion } from "./state";
+	import type { OptionsState } from "./state";
 	import firebase from "firebase/app";
 	import "firebase/functions";
-	import JSON5 from 'json5';
+	import JSON5 from "json5";
 
 	firebase.initializeApp({
 		apiKey: "AIzaSyAeDajuxjFKAYQAl3JWsPGV5KdCa28OLRk",
@@ -16,17 +18,11 @@
 		measurementId: "G-LV8CS7FRKZ",
 	});
 
-	interface OptionsState {
-		error?: string;
-		value: Record<string, unknown>;
-	}
-
 	let output = "";
-	let input = "";
-	let options: OptionsState = {
-		value: {},
-	};
-	let versions = [];
+
+	// init with the default version. All available version will be load async from npm
+	let versions = [getState().terserVersion];
+	let selected = getState().terserVersion;
 
 	const terserVersionsCallable = firebase
 		.functions()
@@ -37,9 +33,9 @@
 	})();
 
 	async function handleInputChange(event) {
-		input = event.detail.value;
-		output = await tryToMinify(input, options);
-		console.log(output);
+		const input = event.detail.value;
+		setInput(input);
+		output = await tryToMinify(input, getState().options);
 	}
 
 	async function tryToMinify(
@@ -53,8 +49,6 @@
 		try {
 			// @ts-ignore
 			const result = await Terser.minify(input, options.value);
-			console.log("input", input, options);
-			console.log("result", result);
 			return result.code;
 		} catch (e) {
 			return JSON.stringify(e);
@@ -63,6 +57,7 @@
 
 	function onVersionChange(event) {
 		const newVersion = event.target.value;
+		setTerserVersion(newVersion);
 		const currentTerserScript = document.getElementById("terser");
 		if (currentTerserScript) {
 			const src = currentTerserScript.getAttribute("src");
@@ -97,21 +92,17 @@
 
 	async function handleOptionChange(event) {
 		try {
-			options.value = JSON5.parse(event.detail.value);
-			options.error = undefined;
+			setOptions({
+				value: JSON5.parse(event.detail.value),
+			});
 		} catch (e) {
-			options.error = `options is not a valid JSON. Error: ${e}`;
+			setOptions({
+				value: event.detail.value,
+				error: `options is not a valid JSON. Error: ${e}`,
+			});
 		}
 
-		if (
-			typeof options !== "object" ||
-			options === null ||
-			Array.isArray(options)
-		) {
-			options.error = `options should be an object, but it is ${options}`;
-		}
-
-		output = await tryToMinify(input, options);
+		output = await tryToMinify(getState().input, getState().options);
 	}
 </script>
 
@@ -145,51 +136,56 @@
 </style>
 
 <svelte:head>
-	<script id="terser" src="https://unpkg.com/terser@5.3.8/dist/bundle.min.js"></script>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+	<script id="terser" src="https://unpkg.com/terser@5.3.8/dist/bundle.min.js">
+	</script>
+	<link
+		rel="stylesheet"
+		href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" />
 </svelte:head>
 
 <div class="app">
 	<nav class="level">
 		<!-- Left side -->
 		<div class="level-left">
-		<div class="level-item">
-			<p class="subtitle is-5">
-			Terser REPL
-			</p>
-		</div>
-		<div class="level-item">
-			<div class="field has-addons">
-			<p class="control">
-				<select value={versions[versions.length - 1]} on:change={onVersionChange}>
-					{#each versions as version}
-						<option value={version}>{version}</option>
-					{/each}
-				</select>
-			</p>
+			<div class="level-item">
+				<p class="subtitle is-5">Terser REPL</p>
+			</div>
+			<div class="level-item">
+				<div class="field has-addons">
+					<p class="control">
+						<select bind:value={selected} on:change={onVersionChange}>
+							{#each versions as version}
+								<option value={version}>{version}</option>
+							{/each}
+						</select>
+					</p>
+				</div>
 			</div>
 		</div>
-		</div>
-	
+
 		<!-- Right side -->
 		<div class="level-right">
-		<p class="level-item"><a>Configuration</a></p>
+			<p class="level-item"><a>Configuration</a></p>
 		</div>
 	</nav>
 
 	<div class="columns">
 		<div class="column">
-			<Input on:value={handleInputChange} initialValue={''} title="input"/>
+			<Input
+				on:value={handleInputChange}
+				initialValue={''}
+				title="input" />
 		</div>
 		<div class="column right">
 			<div class="output">
-				<Output value={output} title="output"/>
+				<Output value={output} title="output" />
 			</div>
 			<div class="config">
-				<Input on:value={handleOptionChange} initialValue={'{}'} title="config"/>
+				<Input
+					on:value={handleOptionChange}
+					initialValue={'{}'}
+					title="config" />
 			</div>
 		</div>
 	</div>
 </div>
-
-
