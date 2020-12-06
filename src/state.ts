@@ -6,48 +6,43 @@ export interface AppState {
     options: OptionsState;
 }
 
+export interface ClientState extends AppState {
+    initialized: boolean;
+}
+
 export interface OptionsState {
     error?: string;
     value: Record<string, unknown>;
 }
 
-export function getState(): AppState {
-    return AppState;
+export function getState(): ClientState {
+    return ClientState;
 }
 
-export function setState(state: AppState): void {
-    AppState = { ...state };
-    saveState(state);
+export function setState(state: ClientState, persist: boolean = true): void {
+    ClientState = { ...state };
+    if (persist) {
+        saveState(state);
+    }
 }
 
 export function setTerserVersion(terserVersion: string): void {
-    setState({ ...AppState, terserVersion });
+    setState({ ...ClientState, terserVersion });
 }
 
 export function setInput(input: string): void {
-    setState(AppState = { ...AppState, input });
+    setState(ClientState = { ...ClientState, input });
 }
 
 export function setOptions(options: OptionsState): void {
-    setState(AppState = { ...AppState, options });
+    setState(ClientState = { ...ClientState, options });
 }
 
-let AppState = {
+let ClientState = {
     terserVersion: '5.3.8',
     input: '',
     options: {
         value: {}
-    }
+    },
+    initialized: false
 };
-
-// init state from persistence
-(async () => {
-    try {
-        const persistedState = await readState();
-        if (persistedState) {
-            AppState = persistedState;
-        }
-    } catch (e) {
-        console.warn('unable to read persisted state')
-    }
-})()

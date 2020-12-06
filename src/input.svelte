@@ -1,12 +1,12 @@
 <script>
     import { createEventDispatcher } from "svelte";
 
-    export let initialValue = "";
+    export let value = "";
     export let title = "";
 
     const dispatch = createEventDispatcher();
     function onValueChanged(event) {
-        dispatch('value', {
+        dispatch('change', {
             value: event.target.value
         });
     }
@@ -35,5 +35,5 @@
 </style>
 <div class="container">
     <p class="title">{title}:</p>
-    <textarea class="textarea has-fixed-size" on:keyup={onValueChanged}>{initialValue}</textarea>
+    <textarea class="textarea has-fixed-size" on:keyup={onValueChanged} bind:value={value}></textarea>
 </div>

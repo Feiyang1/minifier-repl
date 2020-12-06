@@ -20,6 +20,8 @@ Unfortunately they are pretty primitive and don't meet all my requirements.
     - code highlight
     - prettify layout with css
     - ~~default value in version selection dropdown~~
+    - show spinner while initializing states from persistence
 - Clean up TODOs in code
 - ~~Accept relaxed JSON object as configuration~~
-- Persistence
+- ~~Persistence~~
+- throttle user inputs
