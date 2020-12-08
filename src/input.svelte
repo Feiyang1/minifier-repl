@@ -1,14 +1,21 @@
-<script>
+<script lang="ts">
     import { createEventDispatcher } from "svelte";
 
     export let value = "";
     export let title = "";
 
+    let debounceTimer: number | undefined;
+    const debounceMs = 500;
     const dispatch = createEventDispatcher();
     function onValueChanged(event) {
-        dispatch('change', {
-            value: event.target.value
-        });
+        if(debounceTimer) {
+            clearTimeout(debounceTimer);
+        }
+        debounceTimer = setTimeout(() => {
+            dispatch("change", {
+                value: event.target.value,
+            });
+        }, debounceMs);
     }
 </script>
 
@@ -33,7 +40,11 @@
         }
     }
 </style>
+
 <div class="container">
     <p class="title">{title}:</p>
-    <textarea class="textarea has-fixed-size" on:keyup={onValueChanged} bind:value={value}></textarea>
+    <textarea
+        class="textarea has-fixed-size"
+        on:keyup={onValueChanged}
+        bind:value />
 </div>
