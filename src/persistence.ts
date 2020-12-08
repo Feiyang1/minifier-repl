@@ -1,4 +1,4 @@
-import type { AppState } from "./state";
+import type { AppState } from "./store";
 
 const DATABASE_NAME = 'TERSER_REPL_DB';
 const STORE_NAME = 'STATE_STORE'

@@ -24,4 +24,4 @@ Unfortunately they are pretty primitive and don't meet all my requirements.
 - Clean up TODOs in code
 - ~~Accept relaxed JSON object as configuration~~
 - ~~Persistence~~
-- throttle user inputs
+- debounce user inputs

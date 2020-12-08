@@ -1,18 +1,11 @@
 <script lang="ts">
 	import Input from "./input.svelte";
 	import Output from "./output.svelte";
-	import {
-		getState,
-		setInput,
-		setOptions,
-		setState,
-		setTerserVersion,
-	} from "./state";
-	import type { OptionsState } from "./state";
+	import { clientState } from "./store";
+	import type { OptionsState } from "./store";
 	import firebase from "firebase/app";
 	import "firebase/functions";
 	import JSON5 from "json5";
-	import { readState } from "./persistence";
 
 	firebase.initializeApp({
 		apiKey: "AIzaSyAeDajuxjFKAYQAl3JWsPGV5KdCa28OLRk",
@@ -27,37 +20,16 @@
 
 	let terserLoaded = false;
 	let output = "";
-	let input = getState().input;
-	let options = getState().options;
-	let initialOptionValue = JSON.stringify(options.value);
-
+	let selected = $clientState.terserVersion;
 	// init with the default version. All available version will be load async from npm
-	let versions = [getState().terserVersion];
-	let selected = getState().terserVersion;
-
-	// init state from persistence
-	(async () => {
-		try {
-			const persistedState = await readState();
-			if (persistedState) {
-				setState({ ...persistedState, initialized: true }, false);
-				input = persistedState.input;
-				options = persistedState.options;
-				initialOptionValue = JSON.stringify(options.value);
-				selected = persistedState.terserVersion;
-				const newVersions = versions.filter((v) => v !== selected);
-				newVersions.push(selected);
-				versions = newVersions;
-			}
-		} catch (e) {
-			console.warn("unable to read persisted state");
-			setState({ ...getState(), initialized: true });
-		}
-	})();
+	let versions = [$clientState.terserVersion];
 
 	$: (async () => {
 		if (terserLoaded) {
-			output = await tryToMinify(input, options);
+			output = await tryToMinify(
+				$clientState.input,
+				$clientState.options
+			);
 		}
 	})();
 
@@ -67,11 +39,12 @@
 	(async () => {
 		const res = await terserVersionsCallable();
 		versions = res.data;
+		selected = $clientState.terserVersion;
 	})();
 
 	async function handleInputChange(event) {
 		const input = event.detail.value;
-		setInput(input);
+		clientState.setInput(input);
 	}
 
 	async function tryToMinify(
@@ -84,7 +57,7 @@
 
 		// @ts-ignore
 		if (typeof Terser === "undefined") {
-			console.log('terser has not been loaded');
+			console.log("terser has not been loaded");
 			return "";
 		}
 
@@ -99,7 +72,7 @@
 
 	function onVersionChange(event) {
 		const newVersion = event.target.value;
-		setTerserVersion(newVersion);
+		clientState.setTerserVersion(newVersion);
 		const currentTerserScript = document.getElementById("terser");
 		if (currentTerserScript) {
 			const src = currentTerserScript.getAttribute("src");
@@ -134,21 +107,23 @@
 
 	async function handleOptionChange(event) {
 		try {
-			options = {
-				value: JSON5.parse(event.detail.value)
-			};
+			clientState.setOptions({ 
+				value: JSON5.parse(event.detail.value),
+				rawString: event.detail.value
+			});
 		} catch (e) {
-			options = {
-				value: event.detail.value,
+			clientState.setOptions({
+				value: {},
+				rawString: event.detail.value,
 				error: `options is not a valid JSON. Error: ${e}`,
-			};
+			});
 		}
-		setOptions({...options});
 	}
 
 	function onTerserLoad() {
 		terserLoaded = true;
 	}
+
 </script>
 
 <style lang="scss">
@@ -201,7 +176,7 @@
 				<div class="field has-addons">
 					<p class="control">
 						<select
-							bind:value={selected}
+							value={selected}
 							on:change={onVersionChange}>
 							{#each versions as version}
 								<option value={version}>{version}</option>
@@ -222,7 +197,7 @@
 		<div class="column">
 			<Input
 				on:change={handleInputChange}
-				bind:value={input}
+				value={$clientState.input}
 				title="input" />
 		</div>
 		<div class="column right">
@@ -232,7 +207,7 @@
 			<div class="config">
 				<Input
 					on:change={handleOptionChange}
-					value={initialOptionValue}
+					value={$clientState.options.rawString}
 					title="config" />
 			</div>
 		</div>
