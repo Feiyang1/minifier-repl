@@ -1,9 +1,10 @@
 <script lang="ts">
 	import Input from "./input.svelte";
 	import Output from "./output.svelte";
-	import { clientState, getAppState, getShareState } from "./store";
+	import { clientState, getShareState } from "./store";
 	import type { OptionsState } from "./store";
 	import { firebase } from "./firebase";
+	import 'codemirror/lib/codemirror.css';
 
 	import JSON5 from "json5";
 
