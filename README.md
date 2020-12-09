@@ -18,8 +18,8 @@ Unfortunately they are pretty primitive and don't meet all my requirements.
 - ~~Support sharing~~
 - Clean old shared links
 - Various UI improvements
-    - code highlight
-    - prettify layout with css
+    - ~~code highlight~~
+    - ~~prettify layout~~
     - ~~default value in version selection dropdown~~
     - show spinner while initializing states from persistence
 - Clean up TODOs in code
