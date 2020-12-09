@@ -1,22 +1,11 @@
 <script lang="ts">
 	import Input from "./input.svelte";
 	import Output from "./output.svelte";
-	import { clientState } from "./store";
+	import { clientState, getAppState, getShareState } from "./store";
 	import type { OptionsState } from "./store";
-	import firebase from "firebase/app";
-	import "firebase/functions";
-	import JSON5 from "json5";
+	import { firebase } from "./firebase";
 
-	firebase.initializeApp({
-		apiKey: "AIzaSyAeDajuxjFKAYQAl3JWsPGV5KdCa28OLRk",
-		authDomain: "minifier-repl.firebaseapp.com",
-		databaseURL: "https://minifier-repl.firebaseio.com",
-		projectId: "minifier-repl",
-		storageBucket: "minifier-repl.appspot.com",
-		messagingSenderId: "977703229010",
-		appId: "1:977703229010:web:9f00db839d754fe190f18b",
-		measurementId: "G-LV8CS7FRKZ",
-	});
+	import JSON5 from "json5";
 
 	let terserLoaded = false;
 	let output = "";
@@ -45,6 +34,9 @@
 	async function handleInputChange(event) {
 		const input = event.detail.value;
 		clientState.setInput(input);
+
+		// if it was a shared repl, set the flag to false on input change
+		clientState.setShared(false);
 	}
 
 	async function tryToMinify(
@@ -107,9 +99,9 @@
 
 	async function handleOptionChange(event) {
 		try {
-			clientState.setOptions({ 
+			clientState.setOptions({
 				value: JSON5.parse(event.detail.value),
-				rawString: event.detail.value
+				rawString: event.detail.value,
 			});
 		} catch (e) {
 			clientState.setOptions({
@@ -118,12 +110,23 @@
 				error: `options is not a valid JSON. Error: ${e}`,
 			});
 		}
+
+		// if it was a shared repl, set the flag to false on config change
+		clientState.setShared(false);
 	}
 
 	function onTerserLoad() {
 		terserLoaded = true;
 	}
 
+	async function onShare() {
+		console.log("share the repl page");
+		const firestore = firebase.firestore();
+		const docRef = await firestore
+			.collection("shared")
+			.add(getShareState($clientState));
+		clientState.setShared(true, docRef.id);
+	}
 </script>
 
 <style lang="scss">
@@ -175,9 +178,7 @@
 			<div class="level-item">
 				<div class="field has-addons">
 					<p class="control">
-						<select
-							value={selected}
-							on:change={onVersionChange}>
+						<select value={selected} on:change={onVersionChange}>
 							{#each versions as version}
 								<option value={version}>{version}</option>
 							{/each}
@@ -189,6 +190,13 @@
 
 		<!-- Right side -->
 		<div class="level-right">
+			{#if !$clientState.shared}
+				<p class="level-item" on:click={onShare}><a>Share</a></p>
+			{:else}
+				<p class="level-item">
+					<a>{location.origin}/{$clientState.shareId}</a>
+				</p>
+			{/if}
 			<p class="level-item"><a>Configuration</a></p>
 		</div>
 	</nav>

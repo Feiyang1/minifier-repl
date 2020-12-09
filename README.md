@@ -15,7 +15,8 @@ Unfortunately they are pretty primitive and don't meet all my requirements.
 - ~~Support options simple - take a JSON blob~~
 - Support options advanced - let people enable/disable options using checkboxes
 - ~~Support multiple terser versions~~
-- Support sharing URL
+- ~~Support sharing~~
+- Clean old shared links
 - Various UI improvements
     - code highlight
     - prettify layout with css
@@ -24,4 +25,4 @@ Unfortunately they are pretty primitive and don't meet all my requirements.
 - Clean up TODOs in code
 - ~~Accept relaxed JSON object as configuration~~
 - ~~Persistence~~
-- debounce user inputs
+- ~~debounce user inputs~~
