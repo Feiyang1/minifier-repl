@@ -4,10 +4,11 @@
 	import { clientState, getShareState } from "./store";
 	import type { OptionsState } from "./store";
 	import { firebase } from "./firebase";
-	import 'codemirror/lib/codemirror.css';
+	import "codemirror/lib/codemirror.css";
 
 	import JSON5 from "json5";
 
+	let showSpinner = false;
 	let terserLoaded = false;
 	let output = "";
 	let selected = $clientState.terserVersion;
@@ -22,6 +23,18 @@
 			);
 		}
 	})();
+
+	// show spinner on timer (mimic suspense delay behavior in React)
+	let spinnerTimer = setTimeout(() => {
+		if (!$clientState.initialized) {
+			showSpinner = true;
+		}
+	}, 500);
+
+	$: if($clientState.initialized && terserLoaded) {
+		showSpinner = false;
+		clearTimeout(spinnerTimer);
+	}
 
 	const terserVersionsCallable = firebase
 		.functions()
@@ -154,6 +167,29 @@
 		}
 	}
 
+	.loading {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		margin: auto;
+		border: 16px solid #f3f3f3; /* Light grey */
+		border-top: 16px solid #3498db; /* Blue */
+		border-radius: 50%;
+		width: 120px;
+		height: 120px;
+		animation: spin 2s linear infinite;
+	}
+	@keyframes spin {
+		0% {
+			transform: rotate(0deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+
 	:global(body) {
 		padding: 0.5 rem;
 	}
@@ -202,23 +238,27 @@
 		</div>
 	</nav>
 
-	<div class="columns">
-		<div class="column">
-			<Input
-				on:change={handleInputChange}
-				value={$clientState.input}
-				title="input" />
-		</div>
-		<div class="column right">
-			<div class="output">
-				<Output value={output} title="output" />
-			</div>
-			<div class="config">
+	{#if $clientState.initialized && terserLoaded}
+		<div class="columns">
+			<div class="column">
 				<Input
-					on:change={handleOptionChange}
-					value={$clientState.options.rawString}
-					title="config" />
+					on:change={handleInputChange}
+					value={$clientState.input}
+					title="input" />
+			</div>
+			<div class="column right">
+				<div class="output">
+					<Output value={output} title="output" />
+				</div>
+				<div class="config">
+					<Input
+						on:change={handleOptionChange}
+						value={$clientState.options.rawString}
+						title="config" />
+				</div>
 			</div>
 		</div>
-	</div>
+	{:else if showSpinner}
+		<div class="loading"></div>
+	{/if}
 </div>
