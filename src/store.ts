@@ -97,6 +97,7 @@ export const clientState = createClientState();
         }
     } catch (e) {
         console.warn("unable to read persisted state");
+    } finally {
         clientState.setInitialized(true);
     }
 })();
