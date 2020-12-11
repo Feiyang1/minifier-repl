@@ -13,4 +13,7 @@ firebase.initializeApp({
     measurementId: "G-LV8CS7FRKZ",
 });
 
+// firebase.firestore().useEmulator('localhost', 8080);
+// firebase.functions().useEmulator('localhost', 5001);
+
 export { firebase };
